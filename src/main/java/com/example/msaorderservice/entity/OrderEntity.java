@@ -17,7 +17,7 @@ public class OrderEntity implements Serializable {
     @Id @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, length = 120, unique = true)
+    @Column(nullable = false, length = 120)
     private String productId;
 
     @Column(nullable = false)
@@ -39,5 +39,9 @@ public class OrderEntity implements Serializable {
     @ColumnDefault("CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @PrePersist
+    private void setCreateAt(){
+        this.createdAt = LocalDateTime.now();
+    }
 
 }
