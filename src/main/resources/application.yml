@@ -1,7 +1,7 @@
 server:
   port: 0 #0번은 randomport를 사용하겠다는 의미
-  servlet:
-    context-path: /order-service
+#  servlet:
+#    context-path: /order-service
 
 spring:
   jpa:
@@ -12,6 +12,17 @@ spring:
       hibernate.format_sql: true
   application:
     name: order-service
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+  zipkin:
+    base-url: http://127.0.0.1:9411
+    enabled: true
+  sleuth:
+    sampler:
+      probability: 1.0
   h2:
     console:
       enabled: true
@@ -43,3 +54,9 @@ eureka:
     service-url:
       #디스커버리 서버가 갖는 위치값
       defaultZone: http://127.0.0.1:8761/eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health, beans, busrefresh, info, metrics, prometheus

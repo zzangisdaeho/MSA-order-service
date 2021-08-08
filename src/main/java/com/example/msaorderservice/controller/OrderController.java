@@ -9,6 +9,7 @@ import com.example.msaorderservice.vo.RequestOrder;
 import com.example.msaorderservice.vo.ResponseOrder;
 import com.netflix.discovery.converters.Auto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 
     private final Environment env;
@@ -41,7 +43,7 @@ public class OrderController {
 
     @PostMapping("/{userId}/orders")
     public ResponseEntity<ResponseOrder> createOrder(@PathVariable("userId") String userId, @RequestBody RequestOrder orderDetails){
-
+        log.info("Before add orders data");
         OrderDto orderDto = mapper.map(orderDetails, OrderDto.class);
         orderDto.setUserId(userId);
 
@@ -59,12 +61,14 @@ public class OrderController {
         orderProducer.send("orders", orderDto);
 
         ResponseOrder responseOrder = mapper.map(orderDto, ResponseOrder.class);
+        log.info("After add orders data");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseOrder);
     }
 
     @GetMapping("/{userId}/orders")
-    public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId){
+    public ResponseEntity<List<ResponseOrder>> getOrder(@PathVariable("userId") String userId) throws Exception {
+        log.info("Before retrieve orders data");
         Iterable<OrderEntity> orderList = orderService.getOrderByUserId(userId);
 
         List<ResponseOrder> result = new ArrayList<>();
@@ -72,6 +76,15 @@ public class OrderController {
         orderList.forEach(order -> {
             result.add(mapper.map(order, ResponseOrder.class));
         });
+
+//        try {
+//            Thread.sleep(1000);
+//            throw new Exception("강제 장애 발생!!");
+//        } catch (InterruptedException e) {
+//            log.warn(e.getMessage());
+//            e.printStackTrace();
+//        }
+        log.info("Add retrieved orders data");
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
